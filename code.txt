@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jungle Flapper</title>
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size to window size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Game variables
+        let bird = {
+            x: canvas.width / 4,
+            y: canvas.height / 2,
+            radius: 20,
+            velocity: 0,
+            gravity: 0.5,
+            jump: -10
+        };
+
+        let obstacles = [];
+        let score = 0;
+        let gameOver = false;
+
+        // Game loop
+        function gameLoop() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw and update bird
+            drawBird();
+            updateBird();
+
+            // Draw and update obstacles
+            drawObstacles();
+            updateObstacles();
+
+            // Check collisions
+            checkCollisions();
+
+            // Draw score
+            drawScore();
+
+            if (!gameOver) {
+                requestAnimationFrame(gameLoop);
+            } else {
+                drawGameOver();
+            }
+        }
+
+        function drawBird() {
+            ctx.fillStyle = 'yellow';
+            ctx.beginPath();
+            ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function updateBird() {
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+
+            // Keep bird within canvas
+            if (bird.y + bird.radius > canvas.height) {
+                bird.y = canvas.height - bird.radius;
+                bird.velocity = 0;
+            }
+        }
+
+        function drawObstacles() {
+            ctx.fillStyle = 'green';
+            obstacles.forEach(obstacle => {
+                ctx.fillRect(obstacle.x, 0, obstacle.width, obstacle.top);
+                ctx.fillRect(obstacle.x, obstacle.bottom, obstacle.width, canvas.height - obstacle.bottom);
+            });
+        }
+
+        function updateObstacles() {
+            if (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width - 200) {
+                let gap = 200;
+                let top = Math.random() * (canvas.height - gap);
+                obstacles.push({
+                    x: canvas.width,
+                    top: top,
+                    bottom: top + gap,
+                    width: 50,
+                    counted: false
+                });
+            }
+
+            obstacles.forEach(obstacle => {
+                obstacle.x -= 2;
+
+                // Score when passing obstacle
+                if (!obstacle.counted && obstacle.x + obstacle.width < bird.x) {
+                    score++;
+                    obstacle.counted = true;
+                }
+            });
+
+            // Remove off-screen obstacles
+            obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.width > 0);
+        }
+
+        function checkCollisions() {
+            obstacles.forEach(obstacle => {
+                if (
+                    bird.x + bird.radius > obstacle.x &&
+                    bird.x - bird.radius < obstacle.x + obstacle.width &&
+                    (bird.y - bird.radius < obstacle.top || bird.y + bird.radius > obstacle.bottom)
+                ) {
+                    gameOver = true;
+                }
+            });
+
+            if (bird.y + bird.radius > canvas.height) {
+                gameOver = true;
+            }
+        }
+
+        function drawScore() {
+            ctx.fillStyle = 'black';
+            ctx.font = '24px Arial';
+            ctx.fillText(`Score: ${score}`, 10, 30);
+        }
+
+        function drawGameOver() {
+            ctx.fillStyle = 'black';
+            ctx.font = '48px Arial';
+            ctx.fillText('Game Over', canvas.width / 2 - 100, canvas.height / 2);
+            ctx.font = '24px Arial';
+            ctx.fillText(`Final Score: ${score}`, canvas.width / 2 - 70, canvas.height / 2 + 40);
+        }
+
+        // Event listeners
+        canvas.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            bird.velocity = bird.jump;
+        });
+
+        window.addEventListener('keydown', function(e) {
+            if (e.code === 'Space') {
+                bird.velocity = bird.jump;
+            }
+        });
+
+        // Start the game
+        gameLoop();
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Jungle Flapper</title>
+    <style>
+        body { margin: 0; padding: 0; overflow: hidden; }
+        canvas { display: block; }
+    </style>
+</head>
+<body>
+    <canvas id="gameCanvas"></canvas>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Set canvas size to window size
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // Game variables
+        let bird = {
+            x: canvas.width / 4,
+            y: canvas.height / 2,
+            radius: 20,
+            velocity: 0,
+            gravity: 0.5,
+            jump: -10
+        };
+
+        let obstacles = [];
+        let score = 0;
+        let gameOver = false;
+
+        // Game loop
+        function gameLoop() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw and update bird
+            drawBird();
+            updateBird();
+
+            // Draw and update obstacles
+            drawObstacles();
+            updateObstacles();
+
+            // Check collisions
+            checkCollisions();
+
+            // Draw score
+            drawScore();
+
+            if (!gameOver) {
+                requestAnimationFrame(gameLoop);
+            } else {
+                drawGameOver();
+            }
+        }
+
+        function drawBird() {
+            ctx.fillStyle = 'yellow';
+            ctx.beginPath();
+            ctx.arc(bird.x, bird.y, bird.radius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function updateBird() {
+            bird.velocity += bird.gravity;
+            bird.y += bird.velocity;
+
+            // Keep bird within canvas
+            if (bird.y + bird.radius > canvas.height) {
+                bird.y = canvas.height - bird.radius;
+                bird.velocity = 0;
+            }
+        }
+
+        function drawObstacles() {
+            ctx.fillStyle = 'green';
+            obstacles.forEach(obstacle => {
+                ctx.fillRect(obstacle.x, 0, obstacle.width, obstacle.top);
+                ctx.fillRect(obstacle.x, obstacle.bottom, obstacle.width, canvas.height - obstacle.bottom);
+            });
+        }
+
+        function updateObstacles() {
+            if (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width - 200) {
+                let gap = 200;
+                let top = Math.random() * (canvas.height - gap);
+                obstacles.push({
+                    x: canvas.width,
+                    top: top,
+                    bottom: top + gap,
+                    width: 50,
+                    counted: false
+                });
+            }
+
+            obstacles.forEach(obstacle => {
+                obstacle.x -= 2;
+
+                // Score when passing obstacle
+                if (!obstacle.counted && obstacle.x + obstacle.width < bird.x) {
+                    score++;
+                    obstacle.counted = true;
+                }
+            });
+
+            // Remove off-screen obstacles
+            obstacles = obstacles.filter(obstacle => obstacle.x + obstacle.width > 0);
+        }
+
+        function checkCollisions() {
+            obstacles.forEach(obstacle => {
+                if (
+                    bird.x + bird.radius > obstacle.x &&
+                    bird.x - bird.radius < obstacle.x + obstacle.width &&
+                    (bird.y - bird.radius < obstacle.top || bird.y + bird.radius > obstacle.bottom)
+                ) {
+                    gameOver = true;
+                }
+            });
+
+            if (bird.y + bird.radius > canvas.height) {
+                gameOver = true;
+            }
+        }
+
+        function drawScore() {
+            ctx.fillStyle = 'black';
+            ctx.font = '24px Arial';
+            ctx.fillText(`Score: ${score}`, 10, 30);
+        }
+
+        function drawGameOver() {
+            ctx.fillStyle = 'black';
+            ctx.font = '48px Arial';
+            ctx.fillText('Game Over', canvas.width / 2 - 100, canvas.height / 2);
+            ctx.font = '24px Arial';
+            ctx.fillText(`Final Score: ${score}`, canvas.width / 2 - 70, canvas.height / 2 + 40);
+        }
+
+        // Event listeners
+        canvas.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            bird.velocity = bird.jump;
+        });
+
+        window.addEventListener('keydown', function(e) {
+            if (e.code === 'Space') {
+                bird.velocity = bird.jump;
+            }
+        });
+
+        // Start the game
+        gameLoop();
+    </script>
+</body>
+</html>
